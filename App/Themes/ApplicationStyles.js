@@ -78,6 +78,10 @@ const ApplicationStyles = {
   btnPrimary: {
     backgroundColor: Colors.teal,
     borderColor: Colors.teal
+  },
+  redBG: {
+    backgroundColor: Colors.fire,
+    color: Colors.snow
   }
 }
 

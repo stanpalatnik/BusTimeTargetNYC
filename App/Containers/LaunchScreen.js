@@ -2,6 +2,8 @@ import React from 'react'
 import { ScrollView, Text, Image, View } from 'react-native'
 import { Images } from '../Themes'
 import RoundedButton from '../../App/Components/RoundedButton'
+import AlertMessage from '../../App/Components/AlertMessage'
+
 
 // Styles
 import styles from './Styles/LaunchScreenStyles'
@@ -21,6 +23,10 @@ export default class LaunchScreen extends React.Component {
               text='Add Route Tracker'
               onPress={() => window.alert('We are tracking this!')}
             />
+          </View>
+
+          <View style={styles.section} >
+            <AlertMessage title={'No routes configured'} show={true}/>
           </View>
 
         </ScrollView>
