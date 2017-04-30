@@ -7,7 +7,7 @@ export default StyleSheet.create({
     paddingBottom: Metrics.baseMargin
   },
   logo: {
-    marginTop: Metrics.doubleSection,
+    marginTop: Metrics.baseMargin,
     height: Metrics.images.logo,
     width: Metrics.images.logo,
     resizeMode: 'contain'
@@ -18,5 +18,8 @@ export default StyleSheet.create({
   circleBorder: {
     borderColor: Colors.white,
     borderRadius: 15
+  },
+  btnPrimary: {
+    ...ApplicationStyles.btnPrimary
   }
 })

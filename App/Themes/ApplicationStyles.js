@@ -74,6 +74,10 @@ const ApplicationStyles = {
     borderColor: Colors.ember,
     alignItems: 'center',
     textAlign: 'center'
+  },
+  btnPrimary: {
+    backgroundColor: Colors.teal,
+    borderColor: Colors.teal
   }
 }
 
