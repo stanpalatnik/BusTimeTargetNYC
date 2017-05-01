@@ -12,6 +12,7 @@ import Styles from './Styles/NavigationDrawerStyles'
 class NavigationDrawer extends Component {
   render () {
     const state = this.props.navigationState
+    console.log('navigation state:' + state.open)
     const children = state.children
     return (
       <Drawer
