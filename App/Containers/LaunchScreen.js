@@ -8,7 +8,7 @@ import { Actions } from 'react-native-router-flux';
 
 // Styles
 import styles from './Styles/LaunchScreenStyles'
-import DevscreensButton from "./DevscreensButton";
+import AddStopButton from "./AddStopButton";
 
 export default class LaunchScreen extends React.Component {
   render () {
@@ -18,18 +18,8 @@ export default class LaunchScreen extends React.Component {
           <View style={styles.centered}>
             <Image source={Images.logo} style={[styles.logo, styles.circleBorder]} />
           </View>
-
           <View style={styles.section} >
-            <RoundedButton
-              styles={styles.btnPrimary}
-              text='Add Stop Tracker'
-              // onPress={() => BusTimeAPI.create().getRoutes('MTABC').then(console.log)}
-              onPress={Actions.launchScreenTest}
-            />
-            <DevscreensButton/>
-          </View>
-
-          <View style={styles.section} >
+            <AddStopButton styles={styles.btnPrimary}/>
             <AlertMessage title={'No stops configured'} show={true}/>
           </View>
 

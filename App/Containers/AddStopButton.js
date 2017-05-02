@@ -2,9 +2,9 @@ import React from 'react'
 import { View, Modal } from 'react-native'
 import DebugConfig from '../../App/Config/DebugConfig'
 import RoundedButton from '../../App/Components/RoundedButton'
-import LaunchScreenTest from "./LaunchScreenTest";
+import SearchStopScreen from "./SearchStopScreen";
 
-export default class DevscreensButton extends React.Component {
+export default class AddStopButton extends React.Component {
   constructor (props) {
     super(props)
     this.state = {
@@ -19,13 +19,13 @@ export default class DevscreensButton extends React.Component {
   render () {
     return (
       <View>
-        <RoundedButton onPress={this.toggleModal}>
-          Open DevScreens
+        <RoundedButton styles={this.props.styles} onPress={this.toggleModal}>
+          Add Stop Route
         </RoundedButton>
         <Modal
           visible={this.state.showModal}
           onRequestClose={this.toggleModal}>
-          <LaunchScreenTest/>
+          <SearchStopScreen/>
         </Modal>
       </View>
     )
