@@ -7,12 +7,12 @@ import Icon from 'react-native-vector-icons/FontAwesome'
 export default class SearchBar extends React.Component {
   static propTypes = {
     onSearch: React.PropTypes.func.isRequired,
-    onCancel: React.PropTypes.func.isRequired,
+    onChange: React.PropTypes.func.isRequired,
     searchTerm: React.PropTypes.string
   }
 
   render () {
-    const { onChange, onSearch, onCancel, searchTerm } = this.props
+    const { onChange, onSearch, searchTerm } = this.props
     const onSubmitEditing = () => onSearch(searchTerm)
     return (
       <View style={styles.container}>

@@ -1,11 +1,13 @@
 import React from 'react'
-import { ScrollView, Text, Image, View, LayoutAnimation } from 'react-native'
+import { ScrollView, ListView, Text, Image, View, LayoutAnimation } from 'react-native'
 import { Images } from '../Themes'
 import AlertMessage from '../../App/Components/AlertMessage'
 import BusTimeAPI from '../../App/Services/BusTimeApi'
 import SearchBar from '../Components/SearchBar'
 import { connect } from 'react-redux'
 import SearchActions from '../Redux/SearchRedux'
+import { AsyncStorage } from 'react-native'
+import { union } from 'ramda'
 
 // Styles
 import styles from './Styles/LaunchScreenStyles'
@@ -13,22 +15,22 @@ import SearchStyles from './Styles/SearchStyles'
 
 class SearchStopScreen extends React.Component {
   constructor (props) {
+    const rowHasChanged = (r1, r2) => r1 !== r2
+
+    // DataSource configured
+    const ds = new ListView.DataSource({rowHasChanged})
+
     super(props)
     this.state = {
       showSearchBar: true,
-      searchTerm: ''
+      dataSource: ds.cloneWithRows(this.props.results)
     }
   }
 
-  updateSearchTerm = (searchTerm) => {
-    this.setState({
-      searchTerm: searchTerm
-    })
-     this.props.performSearch(searchTerm)
-  }
-
   onSearch = () => {
-    console.log(this.state.searchTerm)
+    console.log('searching: ' + this.props.searchTerm)
+    this.props.performSearch(this.props.searchTerm)
+    this.state.dataSource = this.state.dataSource.cloneWithRows(this.props.results)
   }
 
   showSearchBar = () => {
@@ -44,13 +46,39 @@ class SearchStopScreen extends React.Component {
     if (this.state.showSearchBar) {
       return <View style={SearchStyles.iBox}>
         <ScrollView>
-          <SearchBar onChange={(e) => this.updateSearchTerm(e)} onSearch={(e) => this.onSearch()} searchTerm={this.props.searchTerm} onCancel={this.cancelSearch} />
+          <SearchBar onChange={(e) => {
+            this.props.performSearch(e);
+            this.state.dataSource = this.state.dataSource.cloneWithRows(this.props.results) }
+          } onSearch={(e) => this.onSearch()} searchTerm={this.props.searchTerm} />
         </ScrollView>
       </View>
     } else {
       return (
-        <Image resizeMode='cover' style={styles.logo} source={Images.clearLogo} />
+        <ListView
+          contentContainerStyle={styles.listContent}
+          dataSource={this.state.dataSource}
+          renderRow={this.renderRow}
+          pageSize={15}
+        />
       )
+    }
+  }
+
+  noRowData () {
+    return this.state.dataSource.getRowCount() === 0
+  }
+
+  renderRow (rowData) {
+    if (rowData !== null && rowData !== undefined) {
+      return (
+        <View style={styles.row}>
+          <Text style={styles.boldLabel}>{rowData.shortName}</Text>
+          <Text style={styles.label}>{rowData.longName}</Text>
+        </View>
+      )
+    }
+    else {
+      return <View/>
     }
   }
 
@@ -59,6 +87,12 @@ class SearchStopScreen extends React.Component {
       <View style={styles.mainContainer}>
         <View style={SearchStyles.modalHeader}/>
         {this.renderMiddle()}
+        <ListView
+          contentContainerStyle={styles.listContent}
+          dataSource={this.state.dataSource}
+          renderRow={this.renderRow}
+          pageSize={15}
+        />
       </View>
     )
   }
@@ -66,14 +100,15 @@ class SearchStopScreen extends React.Component {
 
 const mapStateToProps = (state) => {
   return {
-    searchTerm: state.search.searchTerm
+    searchTerm: state.search.searchTerm,
+    results: state.search.results
   }
 }
 
 const mapDispatchToProps = (dispatch) => {
   return {
-    performSearch: (searchTerm) => dispatch(SearchActions.search(searchTerm)),
-    cancelSearch: () => dispatch(SearchActions.cancelSearch())
+    performSearch: (searchTerm) => dispatch(SearchActions.search(searchTerm))
+    // cancelSearch: () => dispatch(SearchActions.cancelSearch())
   }
 }
 

@@ -95,7 +95,8 @@ CustomNavBar.propTypes = {
 
 const mapStateToProps = (state) => {
   return {
-    searchTerm: state.search.searchTerm
+    searchTerm: state.search.searchTerm,
+    results: state.search.results
   }
 }
 

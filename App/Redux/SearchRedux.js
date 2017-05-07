@@ -1,19 +1,38 @@
 import { createReducer, createActions } from 'reduxsauce'
 import Immutable from 'seamless-immutable'
-import { filter } from 'ramda'
+import { filter, union, curry } from 'ramda'
 import { startsWith } from 'ramdasauce'
+import { AsyncStorage } from 'react-native'
+import BusTimeAPI from '../../App/Services/BusTimeApi'
 
-const LIST_DATA = ['sausage', 'blubber', 'pencil', 'cloud', 'moon', 'water', 'computer', 'school',
-  'network', 'hammer', 'walking', 'violently', 'mediocre', 'literature', 'chair', 'two', 'window',
-  'cords', 'musical', 'zebra', 'xylophone', 'penguin', 'home', 'dog', 'final', 'ink', 'teacher', 'fun',
-  'website', 'banana', 'uncle', 'softly', 'mega', 'ten', 'awesome', 'attatch', 'blue', 'internet', 'bottle',
-  'tight', 'zone', 'tomato', 'prison', 'hydro', 'cleaning', 'telivision', 'send', 'frog', 'cup', 'book',
-  'zooming', 'falling', 'evily', 'gamer', 'lid', 'juice', 'moniter', 'captain', 'bonding', 'loudly', 'thudding',
-  'guitar', 'shaving', 'hair', 'soccer', 'water', 'racket', 'table', 'late', 'media', 'desktop', 'flipper',
-  'club', 'flying', 'smooth', 'monster', 'purple', 'guardian', 'bold', 'hyperlink', 'presentation', 'world', 'national',
-  'comment', 'element', 'magic', 'lion', 'sand', 'crust', 'toast', 'jam', 'hunter', 'forest', 'foraging',
-  'silently', 'tawesomated', 'joshing', 'pong', 'RANDOM', 'WORD'
-]
+var ROUTES = []
+
+async function getRoutes () {
+  console.log('getting routes')
+  try {
+    const busCompanyRoutes = await AsyncStorage.getItem('Routes')
+    if (busCompanyRoutes !== null) {
+      ROUTES = union(ROUTES, JSON.parse(busCompanyRoutes))
+    } else {
+      const api = BusTimeAPI.create()
+      console.log('fetching routes through api')
+      const busCompanyRoutes = await api.getRoutes('MTABC')
+      const transitRoutes = await api.getRoutes('MTA NYCT')
+      const combinedRoutes = union(busCompanyRoutes.data['data'].list, transitRoutes.data['data'].list)
+      AsyncStorage.setItem('Routes', JSON.stringify(combinedRoutes))
+      ROUTES = union(ROUTES, JSON.parse(busCompanyRoutes))
+    }
+  } catch (error) {
+    console.log(error)
+  }
+}
+
+var filterRoute = curry(function (subString, route) {
+  if (route === null) return false
+  if (route.shortName.toUpperCase().includes(subString.toUpperCase())) return true
+  if (route.longName.toUpperCase().includes(subString.toUpperCase())) return true
+  return false
+})
 
 /* ------------- Types and Action Creators ------------- */
 
@@ -30,13 +49,13 @@ export default Creators
 export const INITIAL_STATE = Immutable({
   searchTerm: '',
   searching: false,
-  results: LIST_DATA
+  results: getRoutes()
 })
 
 /* ------------- Reducers ------------- */
 
 export const performSearch = (state, { searchTerm }) => {
-  const results = filter(startsWith(searchTerm), LIST_DATA)
+  const results = filter(filterRoute(searchTerm), ROUTES)
   return state.merge({ searching: true, searchTerm, results })
 }
 

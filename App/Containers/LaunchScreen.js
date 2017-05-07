@@ -3,7 +3,6 @@ import { ScrollView, Text, Image, View } from 'react-native'
 import { Images } from '../Themes'
 import RoundedButton from '../../App/Components/RoundedButton'
 import AlertMessage from '../../App/Components/AlertMessage'
-import BusTimeAPI from '../../App/Services/BusTimeApi'
 import { Actions } from 'react-native-router-flux';
 
 // Styles
