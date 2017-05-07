@@ -4,20 +4,31 @@ import { Images } from '../Themes'
 import AlertMessage from '../../App/Components/AlertMessage'
 import BusTimeAPI from '../../App/Services/BusTimeApi'
 import SearchBar from '../Components/SearchBar'
+import { connect } from 'react-redux'
+import SearchActions from '../Redux/SearchRedux'
 
 // Styles
 import styles from './Styles/LaunchScreenStyles'
+import SearchStyles from './Styles/SearchStyles'
 
-export default class SearchStopScreen extends React.Component {
+class SearchStopScreen extends React.Component {
   constructor (props) {
     super(props)
     this.state = {
-      showSearchBar: true
+      showSearchBar: true,
+      searchTerm: ''
     }
   }
 
-  onSearch = (searchTerm) => {
-    this.props.performSearch(searchTerm)
+  updateSearchTerm = (searchTerm) => {
+    this.setState({
+      searchTerm: searchTerm
+    })
+     this.props.performSearch(searchTerm)
+  }
+
+  onSearch = () => {
+    console.log(this.state.searchTerm)
   }
 
   showSearchBar = () => {
@@ -31,7 +42,11 @@ export default class SearchStopScreen extends React.Component {
   renderMiddle () {
     LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut)
     if (this.state.showSearchBar) {
-      return <SearchBar onSearch={(e) => console.log(e)} searchTerm={this.props.searchTerm} onCancel={this.cancelSearch} />
+      return <View style={SearchStyles.iBox}>
+        <ScrollView>
+          <SearchBar onChange={(e) => this.updateSearchTerm(e)} onSearch={(e) => this.onSearch()} searchTerm={this.props.searchTerm} onCancel={this.cancelSearch} />
+        </ScrollView>
+      </View>
     } else {
       return (
         <Image resizeMode='cover' style={styles.logo} source={Images.clearLogo} />
@@ -42,8 +57,25 @@ export default class SearchStopScreen extends React.Component {
   render () {
     return (
       <View style={styles.mainContainer}>
+        <View style={SearchStyles.modalHeader}/>
         {this.renderMiddle()}
       </View>
     )
   }
 }
+
+const mapStateToProps = (state) => {
+  return {
+    searchTerm: state.search.searchTerm
+  }
+}
+
+const mapDispatchToProps = (dispatch) => {
+  return {
+    performSearch: (searchTerm) => dispatch(SearchActions.search(searchTerm)),
+    cancelSearch: () => dispatch(SearchActions.cancelSearch())
+  }
+}
+
+export default connect(mapStateToProps, mapDispatchToProps)(SearchStopScreen)
+

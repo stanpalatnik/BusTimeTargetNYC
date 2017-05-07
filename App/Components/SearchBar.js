@@ -12,7 +12,7 @@ export default class SearchBar extends React.Component {
   }
 
   render () {
-    const { onSearch, onCancel, searchTerm } = this.props
+    const { onChange, onSearch, onCancel, searchTerm } = this.props
     const onSubmitEditing = () => onSearch(searchTerm)
     return (
       <View style={styles.container}>
@@ -20,20 +20,20 @@ export default class SearchBar extends React.Component {
         <TextInput
           ref='searchText'
           autoFocus
-          placeholder='Search'
-          placeholderTextColor={Colors.snow}
+          placeholder='Search Bus Route'
+          placeholderTextColor={Colors.teal}
           underlineColorAndroid='transparent'
           style={styles.searchInput}
           value={this.props.searchTerm}
-          onChangeText={onSearch}
+          onChangeText={onChange}
           autoCapitalize='none'
           onSubmitEditing={onSubmitEditing}
           returnKeyType={'search'}
           autoCorrect={false}
           selectionColor={Colors.snow}
         />
-        <TouchableOpacity onPress={onCancel} style={styles.cancelButton}>
-          <Text style={styles.buttonLabel}>Cancel</Text>
+        <TouchableOpacity onPress={onSubmitEditing} style={styles.cancelButton}>
+          <Text style={styles.buttonLabel}>Search</Text>
         </TouchableOpacity>
       </View>
     )
