@@ -1,13 +1,13 @@
 import React from 'react'
-import { ScrollView, ListView, Text, Image, View, LayoutAnimation } from 'react-native'
+import { ScrollView, ListView, Text, Image, View, LayoutAnimation, TouchableHighlight, TouchableOpacity } from 'react-native'
 import { Images } from '../Themes'
 import AlertMessage from '../../App/Components/AlertMessage'
 import BusTimeAPI from '../../App/Services/BusTimeApi'
 import SearchBar from '../Components/SearchBar'
 import { connect } from 'react-redux'
 import SearchActions from '../Redux/SearchRedux'
-import { AsyncStorage } from 'react-native'
-import { union } from 'ramda'
+import { StackNavigator } from 'react-navigation'
+import ListViewExample from './ListviewExample'
 
 // Styles
 import styles from './Styles/LaunchScreenStyles'
@@ -28,6 +28,7 @@ class SearchStopScreen extends React.Component {
   }
 
   onSearch = () => {
+    this.props.navigation.navigate('ListViewExample')
     console.log('searching: ' + this.props.searchTerm)
     this.props.performSearch(this.props.searchTerm)
     this.state.dataSource = this.state.dataSource.cloneWithRows(this.props.results)
@@ -46,10 +47,8 @@ class SearchStopScreen extends React.Component {
     if (this.state.showSearchBar) {
       return <View style={SearchStyles.iBox}>
         <ScrollView>
-          <SearchBar onChange={(e) => {
-            this.props.performSearch(e);
-            this.state.dataSource = this.state.dataSource.cloneWithRows(this.props.results) }
-          } onSearch={(e) => this.onSearch()} searchTerm={this.props.searchTerm} />
+          <SearchBar onChange={(e) => this.props.performSearch(e) } onSearch={(e) => this.onSearch()}
+                     searchTerm={this.props.searchTerm} />
         </ScrollView>
       </View>
     } else {
@@ -68,16 +67,28 @@ class SearchStopScreen extends React.Component {
     return this.state.dataSource.getRowCount() === 0
   }
 
+  componentWillReceiveProps (newProps) {
+    if (newProps.results) {
+      this.setState({
+        dataSource: this.state.dataSource.cloneWithRows(newProps.results)
+      })
+    }
+  }
+
   renderRow (rowData) {
     if (rowData !== null && rowData !== undefined) {
       return (
-        <View style={styles.row}>
-          <Text style={styles.boldLabel}>{rowData.shortName}</Text>
-          <Text style={styles.label}>{rowData.longName}</Text>
-        </View>
+      <TouchableHighlight
+          onPress={() => console.log(rowData)}
+          underlayColor='#ddd'
+          >
+          <View style={styles.row}>
+            <Text style={styles.boldLabel}>{rowData.shortName}</Text>
+            <Text style={styles.label}>{rowData.longName}</Text>
+          </View>
+      </TouchableHighlight>
       )
-    }
-    else {
+    } else {
       return <View/>
     }
   }
@@ -91,7 +102,7 @@ class SearchStopScreen extends React.Component {
           contentContainerStyle={styles.listContent}
           dataSource={this.state.dataSource}
           renderRow={this.renderRow}
-          pageSize={15}
+          pageSize={30}
         />
       </View>
     )
@@ -112,5 +123,26 @@ const mapDispatchToProps = (dispatch) => {
   }
 }
 
-export default connect(mapStateToProps, mapDispatchToProps)(SearchStopScreen)
+export default StackNavigator({
+  SearchStopScreen: {screen: connect(mapStateToProps, mapDispatchToProps)(SearchStopScreen)},
+  ListViewExample: {screen: ListViewExample}
+}, {
+  cardStyle: {
+    opacity: 1,
+    backgroundColor: '#3e243f'
+  },
+  initialRouteName: 'SearchStopScreen',
+  headerMode: 'none',
+  // Keeping this here for future when we can make
+  navigationOptions: {
+    header: {
+      left: (
+        <TouchableOpacity onPress={() => window.alert('pop')} ><Image source={Images.closeButton} style={{marginHorizontal: 10}} /></TouchableOpacity>
+      ),
+      style: {
+        backgroundColor: '#3e243f'
+      }
+    }
+  }
+})
 
