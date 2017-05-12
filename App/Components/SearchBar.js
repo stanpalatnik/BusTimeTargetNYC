@@ -32,6 +32,8 @@ export default class SearchBar extends React.Component {
           autoCorrect={false}
           selectionColor={Colors.snow}
         />
+        <TouchableOpacity onPress={() => { this.props.searchTerm = '' }} style={styles.cancelButton}>
+        </TouchableOpacity>
       </View>
     )
   }
