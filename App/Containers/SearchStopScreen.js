@@ -7,7 +7,7 @@ import SearchBar from '../Components/SearchBar'
 import { connect } from 'react-redux'
 import SearchActions from '../Redux/SearchRedux'
 import { StackNavigator } from 'react-navigation'
-import ListViewExample from './ListviewExample'
+import TimePicker from './TimePicker'
 
 // Styles
 import styles from './Styles/LaunchScreenStyles'
@@ -25,6 +25,7 @@ class SearchStopScreen extends React.Component {
       showSearchBar: true,
       dataSource: ds.cloneWithRows(this.props.results)
     }
+    this.renderRow = this.renderRow.bind(this)
   }
 
   onSearch = () => {
@@ -40,6 +41,10 @@ class SearchStopScreen extends React.Component {
 
   cancelSearch = () => {
     this.setState({showSearchBar: false})
+  }
+
+  selectRoute = (routeData) => {
+    this.props.navigation.navigate('TimePicker', routeData)
   }
 
   renderMiddle () {
@@ -79,7 +84,7 @@ class SearchStopScreen extends React.Component {
     if (rowData !== null && rowData !== undefined) {
       return (
       <TouchableHighlight
-          onPress={() => console.log(rowData)}
+          onPress={() => this.selectRoute(rowData)}
           underlayColor='#ddd'
           >
           <View style={styles.row}>
@@ -119,13 +124,12 @@ const mapStateToProps = (state) => {
 const mapDispatchToProps = (dispatch) => {
   return {
     performSearch: (searchTerm) => dispatch(SearchActions.search(searchTerm))
-    // cancelSearch: () => dispatch(SearchActions.cancelSearch())
   }
 }
 
 export default StackNavigator({
   SearchStopScreen: {screen: connect(mapStateToProps, mapDispatchToProps)(SearchStopScreen)},
-  ListViewExample: {screen: ListViewExample}
+  TimePicker: {screen: TimePicker}
 }, {
   cardStyle: {
     opacity: 1,
