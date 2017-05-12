@@ -5,6 +5,8 @@ import styles from './Styles/LaunchScreenStyles'
 import SearchStyles from './Styles/SearchStyles'
 import RoundedButton from '../../App/Components/RoundedButton'
 import moment from 'moment'
+import Icon from 'react-native-vector-icons/FontAwesome'
+import { Colors, Metrics } from '../Themes/'
 
 export default class TimePicker extends Component {
   defaultProps = {
@@ -47,10 +49,12 @@ export default class TimePicker extends Component {
     return (
     <View style={styles.mainContainer}>
       <View style={SearchStyles.modalHeader}/>
-      <RoundedButton styles={this.props.styles} onPress={this._showDateTimePicker}>
-        Choose Pickup Time
-      </RoundedButton>
-      <Text>{this.state.startTime} - {this.state.endTime}</Text>
+      <View style={styles.centerButton}>
+        <TouchableOpacity onPress={this._showDateTimePicker}>
+          <Icon name='clock-o' size={Metrics.icons.xxl} />
+        </TouchableOpacity>
+      </View>
+      <Text style={styles.sectionTitle}>{this.state.startTime} - {this.state.endTime}</Text>
       <Slider
         value={this.defaultProps.range}
         step={0.5}
@@ -63,6 +67,9 @@ export default class TimePicker extends Component {
         onConfirm={this._handleDatePicked}
         onCancel={this._hideDateTimePicker}
       />
+      <RoundedButton styles={styles.btnPrimary} onPress={this._showDateTimePicker}>
+        Save
+      </RoundedButton>
     </View>
     )
   }

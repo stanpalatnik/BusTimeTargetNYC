@@ -82,6 +82,13 @@ const ApplicationStyles = {
   redBG: {
     backgroundColor: Colors.fire,
     color: Colors.snow
+  },
+  centerButton: {
+    paddingTop: 30,
+    flex: 1,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'flex-start'
   }
 }
 

@@ -81,7 +81,7 @@ class SearchStopScreen extends React.Component {
   }
 
   renderRow (rowData) {
-    if (rowData !== null && rowData !== undefined) {
+    if (rowData !== null && rowData !== undefined && rowData.shortName !== undefined && rowData.shortName.length > 0) {
       return (
       <TouchableHighlight
           onPress={() => this.selectRoute(rowData)}
