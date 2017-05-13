@@ -1,31 +1,39 @@
 import React, { Component } from 'react'
-import { Text, TouchableOpacity, View, Slider } from 'react-native'
+import { Text, TouchableOpacity, View, Slider, AsyncStorage } from 'react-native'
 import DateTimePicker from 'react-native-modal-datetime-picker'
 import styles from './Styles/LaunchScreenStyles'
 import SearchStyles from './Styles/SearchStyles'
 import RoundedButton from '../../App/Components/RoundedButton'
 import moment from 'moment'
 import Icon from 'react-native-vector-icons/FontAwesome'
-import { Colors, Metrics } from '../Themes/'
+import { Metrics } from '../Themes/'
+import { StackNavigator } from 'react-navigation'
 
 export default class TimePicker extends Component {
-  defaultProps = {
-    range: 2.5
-  }
+  constructor (props) {
+    super(props)
 
-  state = {
-    isDateTimePickerVisible: false,
-    selectedTime: null,
-    startTime: null,
-    endTime: null,
-    range: this.defaultProps.range
-  };
+    this.defaultProps = {
+      range: 2.5
+    }
+
+    this.state = {
+      isDateTimePickerVisible: false,
+      selectedTime: null,
+      startTime: null,
+      endTime: null,
+      range: this.defaultProps.range
+    }
+
+    this.saveRouteTime = this.saveRouteTime.bind(this)
+  }
 
   _showDateTimePicker = () => this.setState({ isDateTimePickerVisible: true });
 
   _hideDateTimePicker = () => this.setState({ isDateTimePickerVisible: false });
 
   _handleDatePicked = (time) => {
+    console.log(this.props.navigation.state.params)
     console.log(time.getHours() + ':' + time.getMinutes())
     console.log('A time has been picked: ', time)
     this.setState({
@@ -43,6 +51,32 @@ export default class TimePicker extends Component {
       startTime: moment(time).subtract(this.state.range, 'm').format('h:mm a'),
       endTime: moment(time).add(this.state.range, 'm').format('h:mm a')
     })
+  }
+
+  saveRouteTime = async () => {
+    const route = this.props.navigation.state.params
+    const routeObj = {
+      agencyId: route.agencyId,
+      id: route.id
+    }
+    console.log('adding routetime: ' + routeObj)
+    try {
+      const routes = await AsyncStorage.getItem('RouteTimes')
+      if (routes === null) {
+        const routesList = [routeObj]
+        console.log('creating first routetime: ' + routesList)
+        AsyncStorage.setItem('RouteTimes', JSON.stringify(routesList))
+      } else {
+        const routesList = JSON.parse(routes)
+        console.log('adding to existing routetime: ' + routesList)
+        routesList.push(routeObj)
+        console.log('combined route object: ' + routesList)
+        AsyncStorage.setItem('RouteTimes', JSON.stringify(routesList))
+      }
+      this.props.navigation.navigate('SearchStopScreen')
+    } catch (error) {
+      console.log('error saving route time: ' + error)
+    }
   }
 
   render () {
@@ -67,7 +101,7 @@ export default class TimePicker extends Component {
         onConfirm={this._handleDatePicked}
         onCancel={this._hideDateTimePicker}
       />
-      <RoundedButton styles={styles.btnPrimary} onPress={this._showDateTimePicker}>
+      <RoundedButton styles={styles.btnPrimary} onPress={this.saveRouteTime}>
         Save
       </RoundedButton>
     </View>
