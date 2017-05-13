@@ -85,10 +85,8 @@ const ApplicationStyles = {
   },
   centerButton: {
     paddingTop: 30,
-    flex: 1,
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'flex-start'
+    justifyContent: 'center',
+    alignItems: 'center'
   }
 }
 

@@ -2,6 +2,7 @@ import React, { Component } from 'react'
 import { Text, TouchableOpacity, View, Slider, AsyncStorage } from 'react-native'
 import DateTimePicker from 'react-native-modal-datetime-picker'
 import styles from './Styles/LaunchScreenStyles'
+import appStyles from '../../App/Themes/ApplicationStyles'
 import SearchStyles from './Styles/SearchStyles'
 import RoundedButton from '../../App/Components/RoundedButton'
 import moment from 'moment'
@@ -22,15 +23,16 @@ export default class TimePicker extends Component {
       selectedTime: null,
       startTime: null,
       endTime: null,
-      range: this.defaultProps.range
+      range: this.defaultProps.range,
+      isSaveButtonVisible: false
     }
 
     this.saveRouteTime = this.saveRouteTime.bind(this)
   }
 
-  _showDateTimePicker = () => this.setState({ isDateTimePickerVisible: true });
+  _showDateTimePicker = () => this.setState({ isDateTimePickerVisible: true })
 
-  _hideDateTimePicker = () => this.setState({ isDateTimePickerVisible: false });
+  _hideDateTimePicker = () => this.setState({ isDateTimePickerVisible: false })
 
   _handleDatePicked = (time) => {
     console.log(this.props.navigation.state.params)
@@ -39,10 +41,19 @@ export default class TimePicker extends Component {
     this.setState({
       selectedTime: time,
       startTime: moment(time).subtract(this.state.range, 'm').format('h:mm a'),
-      endTime: moment(time).add(this.state.range, 'm').format('h:mm a')
+      endTime: moment(time).add(this.state.range, 'm').format('h:mm a'),
+      isSaveButtonVisible: true
     })
     this._hideDateTimePicker()
-  };
+  }
+
+  renderSaveButton = () => {
+    if (this.state.isSaveButtonVisible) {
+      return <RoundedButton styles={styles.btnPrimary} onPress={this.saveRouteTime}>
+        Save
+      </RoundedButton>
+    }
+  }
 
   _handleRangePicked = (range) => {
     let time = this.state.selectedTime
@@ -83,7 +94,7 @@ export default class TimePicker extends Component {
     return (
     <View style={styles.mainContainer}>
       <View style={SearchStyles.modalHeader}/>
-      <View style={styles.centerButton}>
+      <View style={appStyles.centerButton}>
         <TouchableOpacity onPress={this._showDateTimePicker}>
           <Icon name='clock-o' size={Metrics.icons.xxl} />
         </TouchableOpacity>
@@ -101,9 +112,7 @@ export default class TimePicker extends Component {
         onConfirm={this._handleDatePicked}
         onCancel={this._hideDateTimePicker}
       />
-      <RoundedButton styles={styles.btnPrimary} onPress={this.saveRouteTime}>
-        Save
-      </RoundedButton>
+      {this.renderSaveButton()}
     </View>
     )
   }

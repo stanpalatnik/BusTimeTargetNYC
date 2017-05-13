@@ -44,6 +44,7 @@ class SearchStopScreen extends React.Component {
   }
 
   selectRoute = (routeData) => {
+    this.props.cancelSearch()
     this.props.navigation.navigate('TimePicker', routeData)
   }
 
@@ -123,7 +124,8 @@ const mapStateToProps = (state) => {
 
 const mapDispatchToProps = (dispatch) => {
   return {
-    performSearch: (searchTerm) => dispatch(SearchActions.search(searchTerm))
+    performSearch: (searchTerm) => dispatch(SearchActions.search(searchTerm)),
+    cancelSearch: () => dispatch(SearchActions.cancelSearch())
   }
 }
 
