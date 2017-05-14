@@ -65,22 +65,24 @@ export default class TimePicker extends Component {
   }
 
   saveRouteTime = async () => {
-    const route = this.props.navigation.state.params.route
-    const routeObj = {
-      agencyId: route.agencyId,
-      id: route.id
+    const {route, stop} = this.props.navigation.state.params
+    const trackerObj = {
+      startTime: this.state.startTime,
+      endTime: this.state.endTime,
+      route: route,
+      stop: stop
     }
-    console.log('adding routetime: ' + routeObj)
+    console.log('adding routetime: ' + JSON.stringify(trackerObj))
     try {
       const routes = await AsyncStorage.getItem('RouteTimes')
       if (routes === null) {
-        const routesList = [routeObj]
+        const routesList = [trackerObj]
         console.log('creating first routetime: ' + routesList)
         AsyncStorage.setItem('RouteTimes', JSON.stringify(routesList))
       } else {
         const routesList = JSON.parse(routes)
         console.log('adding to existing routetime: ' + routesList)
-        routesList.push(routeObj)
+        routesList.push(trackerObj)
         console.log('combined route object: ' + routesList)
         AsyncStorage.setItem('RouteTimes', JSON.stringify(routesList))
       }
