@@ -5,15 +5,17 @@ import AlertMessage from '../../App/Components/AlertMessage'
 import BusTimeAPI from '../../App/Services/BusTimeApi'
 import SearchBar from '../Components/SearchBar'
 import { connect } from 'react-redux'
-import SearchActions from '../Redux/SearchRedux'
+import StopActions from '../Redux/StopRedux'
 import { StackNavigator } from 'react-navigation'
 import TimePicker from './TimePicker'
+import { filter, union, curry } from 'ramda'
+import { AsyncStorage } from 'react-native'
 
 // Styles
 import styles from './Styles/LaunchScreenStyles'
 import SearchStyles from './Styles/SearchStyles'
 
-class SearchStopScreen extends React.Component {
+export default class SearchStopScreen extends React.Component {
   constructor (props) {
     const rowHasChanged = (r1, r2) => r1 !== r2
 
@@ -22,8 +24,9 @@ class SearchStopScreen extends React.Component {
 
     super(props)
     this.state = {
+      stops: [],
       showSearchBar: true,
-      dataSource: ds.cloneWithRows(this.props.results)
+      dataSource: ds.cloneWithRows([])
     }
     this.renderRow = this.renderRow.bind(this)
   }
@@ -35,17 +38,62 @@ class SearchStopScreen extends React.Component {
     this.state.dataSource = this.state.dataSource.cloneWithRows(this.props.results)
   }
 
-  showSearchBar = () => {
-    this.setState({showSearchBar: true})
+  componentWillMount () {
+    const route = this.props.navigation.state.params
+    console.log('getting stops for route: ' + route.id)
+    this.getStops(this.props.navigation.state.params.id).then(foundStops => {
+      console.log('found stops!!: ' + foundStops)
+      this.setState({
+        stops: foundStops,
+        dataSource: this.state.dataSource.cloneWithRows(foundStops)
+      })
+    })
+  }
+
+  getStops = async (routeId) => {
+    console.log('getting stops for route: ' + routeId)
+    try {
+      const routeStops = await AsyncStorage.getItem(`RouteStops:${routeId}`)
+      if (routeStops !== null) {
+        console.log('found stops in cache')
+        return JSON.parse(routeStops)
+      } else {
+        const api = BusTimeAPI.create()
+        console.log('fetching routes through api')
+        const routeStops = await api.getRouteStops(routeId)
+        console.log(routeStops.data.data)
+        console.log('fetched route stops: ' + routeStops.data.data.references.stops)
+        AsyncStorage.setItem(`RouteStops:${routeId}`, JSON.stringify(routeStops.data.data.references.stops))
+        return routeStops.data.data.references.stops
+      }
+    } catch (error) {
+      console.log(error)
+    }
   }
 
   cancelSearch = () => {
-    this.setState({showSearchBar: false})
+    this.setState({
+      dataSource: this.state.dataSource.cloneWithRows(this.state.stops)
+    })
   }
 
-  selectRoute = (routeData) => {
-    this.props.cancelSearch()
-    this.props.navigation.navigate('TimePicker', routeData)
+  filterRoute = curry(function (subString, stop) {
+    if (stop === null) return false
+    if (stop.name.toUpperCase().includes(subString.toUpperCase())) return true
+    return false
+  })
+
+  selectStop = (stopData) => {
+    this.cancelSearch()
+    this.props.navigation.navigate('TimePicker', stopData)
+  }
+
+  searchStops = (term) => {
+    console.log(term)
+    const filteredRoutes = filter(this.filterRoute(term), this.state.stops)
+    this.setState({
+      dataSource: this.state.dataSource.cloneWithRows(filteredRoutes)
+    })
   }
 
   renderMiddle () {
@@ -53,7 +101,7 @@ class SearchStopScreen extends React.Component {
     if (this.state.showSearchBar) {
       return <View style={SearchStyles.iBox}>
         <ScrollView>
-          <SearchBar onChange={(e) => this.props.performSearch(e) } onSearch={(e) => this.onSearch()}
+          <SearchBar onChange={(e) => this.searchStops(e) } onSearch={(e) => this.onSearch()}
                      searchTerm={this.props.searchTerm} />
         </ScrollView>
       </View>
@@ -73,26 +121,18 @@ class SearchStopScreen extends React.Component {
     return this.state.dataSource.getRowCount() === 0
   }
 
-  componentWillReceiveProps (newProps) {
-    if (newProps.results) {
-      this.setState({
-        dataSource: this.state.dataSource.cloneWithRows(newProps.results)
-      })
-    }
-  }
-
   renderRow (rowData) {
-    if (rowData !== null && rowData !== undefined && rowData.shortName !== undefined && rowData.shortName.length > 0) {
+    if (rowData !== null && rowData !== undefined && rowData.id !== undefined && rowData.name.length > 0) {
       return (
-      <TouchableHighlight
-          onPress={() => this.selectRoute(rowData)}
+        <TouchableHighlight
+          onPress={() => this.selectStop(rowData)}
           underlayColor='#ddd'
-          >
+        >
           <View style={styles.row}>
-            <Text style={styles.boldLabel}>{rowData.shortName}</Text>
-            <Text style={styles.label}>{rowData.longName}</Text>
+            <Text style={styles.boldLabel}>{rowData.id}</Text>
+            <Text style={styles.label}>{rowData.name}</Text>
           </View>
-      </TouchableHighlight>
+        </TouchableHighlight>
       )
     } else {
       return <View/>
@@ -114,41 +154,3 @@ class SearchStopScreen extends React.Component {
     )
   }
 }
-
-const mapStateToProps = (state) => {
-  return {
-    searchTerm: state.search.searchTerm,
-    results: state.search.results
-  }
-}
-
-const mapDispatchToProps = (dispatch) => {
-  return {
-    performSearch: (searchTerm) => dispatch(SearchActions.search(searchTerm)),
-    cancelSearch: () => dispatch(SearchActions.cancelSearch())
-  }
-}
-
-export default StackNavigator({
-  SearchStopScreen: {screen: connect(mapStateToProps, mapDispatchToProps)(SearchStopScreen)},
-  TimePicker: {screen: TimePicker}
-}, {
-  cardStyle: {
-    opacity: 1,
-    backgroundColor: '#3e243f'
-  },
-  initialRouteName: 'SearchStopScreen',
-  headerMode: 'none',
-  // Keeping this here for future when we can make
-  navigationOptions: {
-    header: {
-      left: (
-        <TouchableOpacity onPress={() => window.alert('pop')} ><Image source={Images.closeButton} style={{marginHorizontal: 10}} /></TouchableOpacity>
-      ),
-      style: {
-        backgroundColor: '#3e243f'
-      }
-    }
-  }
-})
-

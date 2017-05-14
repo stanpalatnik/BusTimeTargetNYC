@@ -2,7 +2,7 @@ import React from 'react'
 import { View, Modal, Image, TouchableOpacity } from 'react-native'
 import DebugConfig from '../../App/Config/DebugConfig'
 import RoundedButton from '../../App/Components/RoundedButton'
-import SearchStopScreen from "./SearchStopScreen";
+import SearchRouteScreen from "./SearchRouteScreen";
 import { Images } from '../Themes'
 
 export default class AddStopButton extends React.Component {
@@ -31,7 +31,7 @@ export default class AddStopButton extends React.Component {
             }}>
             <Image source={Images.closeButton2x} />
           </TouchableOpacity>
-          <SearchStopScreen/>
+          <SearchRouteScreen/>
         </Modal>
         <RoundedButton styles={this.props.styles} onPress={this.toggleModal}>
           Add Stop Route

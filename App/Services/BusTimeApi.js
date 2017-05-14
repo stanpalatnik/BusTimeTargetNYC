@@ -20,12 +20,14 @@ const create = (baseURL = 'http://bustime.mta.info/api/') => {
     api.addMonitor(console.tron.apisauce)
   }
   const getRoutes = (agencyID) => api.get(`where/routes-for-agency/${agencyID}.json?key=${API_KEY}`)
+  const getRouteStops = (routeID) => api.get(`where/stops-for-route/${routeID}.json?key=${API_KEY}&includePolylines=false&version=2`)
   const getRate = () => api.get('rate_limit')
   const getUser = (username) => api.get('search/users', {q: username})
 
   return {
     // a list of the API functions from step 2
     getRoutes,
+    getRouteStops,
     getRate,
     getUser
   }

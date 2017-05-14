@@ -84,7 +84,7 @@ export default class TimePicker extends Component {
         console.log('combined route object: ' + routesList)
         AsyncStorage.setItem('RouteTimes', JSON.stringify(routesList))
       }
-      this.props.navigation.navigate('SearchStopScreen')
+      this.props.navigation.navigate('SearchRouteScreen')
     } catch (error) {
       console.log('error saving route time: ' + error)
     }
