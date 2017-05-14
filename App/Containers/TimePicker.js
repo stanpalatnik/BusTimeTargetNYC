@@ -65,7 +65,7 @@ export default class TimePicker extends Component {
   }
 
   saveRouteTime = async () => {
-    const route = this.props.navigation.state.params
+    const route = this.props.navigation.state.params.route
     const routeObj = {
       agencyId: route.agencyId,
       id: route.id

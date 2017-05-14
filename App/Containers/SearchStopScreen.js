@@ -1,15 +1,12 @@
 import React from 'react'
-import { ScrollView, ListView, Text, Image, View, LayoutAnimation, TouchableHighlight, TouchableOpacity } from 'react-native'
-import { Images } from '../Themes'
-import AlertMessage from '../../App/Components/AlertMessage'
+import { ScrollView, ListView, Text, Image, View, LayoutAnimation, TouchableHighlight, TouchableWithoutFeedback } from 'react-native'
 import BusTimeAPI from '../../App/Services/BusTimeApi'
 import SearchBar from '../Components/SearchBar'
-import { connect } from 'react-redux'
-import StopActions from '../Redux/StopRedux'
 import { StackNavigator } from 'react-navigation'
 import TimePicker from './TimePicker'
-import { filter, union, curry } from 'ramda'
+import { filter, curry } from 'ramda'
 import { AsyncStorage } from 'react-native'
+import { RadioButtons } from 'react-native-radio-buttons'
 
 // Styles
 import styles from './Styles/LaunchScreenStyles'
@@ -24,18 +21,13 @@ export default class SearchStopScreen extends React.Component {
 
     super(props)
     this.state = {
+      directions: [],
+      searchTerm: '',
       stops: [],
       showSearchBar: true,
       dataSource: ds.cloneWithRows([])
     }
     this.renderRow = this.renderRow.bind(this)
-  }
-
-  onSearch = () => {
-    this.props.navigation.navigate('ListViewExample')
-    console.log('searching: ' + this.props.searchTerm)
-    this.props.performSearch(this.props.searchTerm)
-    this.state.dataSource = this.state.dataSource.cloneWithRows(this.props.results)
   }
 
   componentWillMount () {
@@ -44,9 +36,12 @@ export default class SearchStopScreen extends React.Component {
     this.getStops(this.props.navigation.state.params.id).then(foundStops => {
       console.log('found stops!!: ' + foundStops)
       this.setState({
-        stops: foundStops,
+        directions: foundStops.directions.map(e => e.name.name),
+        directionStopMap: foundStops.directions,
+        stops: foundStops.stops,
         dataSource: this.state.dataSource.cloneWithRows(foundStops)
       })
+      this.setSelectedOption(foundStops.directions[0].name.name)
     })
   }
 
@@ -63,8 +58,12 @@ export default class SearchStopScreen extends React.Component {
         const routeStops = await api.getRouteStops(routeId)
         console.log(routeStops.data.data)
         console.log('fetched route stops: ' + routeStops.data.data.references.stops)
-        AsyncStorage.setItem(`RouteStops:${routeId}`, JSON.stringify(routeStops.data.data.references.stops))
-        return routeStops.data.data.references.stops
+        const stopsModel = {
+          directions: routeStops.data.data.entry.stopGroupings[0].stopGroups,
+          stops: routeStops.data.data.references.stops
+        }
+        AsyncStorage.setItem(`RouteStops:${routeId}`, JSON.stringify(stopsModel))
+        return stopsModel
       }
     } catch (error) {
       console.log(error)
@@ -73,25 +72,35 @@ export default class SearchStopScreen extends React.Component {
 
   cancelSearch = () => {
     this.setState({
+      searchTerm: '',
       dataSource: this.state.dataSource.cloneWithRows(this.state.stops)
     })
   }
 
-  filterRoute = curry(function (subString, stop) {
+  filterRoute = curry(function (subString, ctx, stop) {
     if (stop === null) return false
-    if (stop.name.toUpperCase().includes(subString.toUpperCase())) return true
-    return false
+    console.log(ctx.state.selectedOption)
+    if (ctx.state.selectedOption === undefined) return false
+    if (ctx.state.directionStopMap.filter(e => e.name.name === ctx.state.selectedOption)[0].stopIds.includes(stop.id)) {
+      return (stop.name.toUpperCase().includes(subString.toUpperCase()))
+    } else return false
   })
 
   selectStop = (stopData) => {
+    console.log('selected stop: ' + JSON.stringify(stopData))
     this.cancelSearch()
-    this.props.navigation.navigate('TimePicker', stopData)
+    this.props.navigation.navigate('TimePicker', {
+      route: this.props.navigation.state.params,
+      stop: stopData
+    })
   }
 
   searchStops = (term) => {
+    console.log(this.state.directions)
     console.log(term)
-    const filteredRoutes = filter(this.filterRoute(term), this.state.stops)
+    const filteredRoutes = filter(this.filterRoute(term, this), this.state.stops)
     this.setState({
+      searchTerm: term,
       dataSource: this.state.dataSource.cloneWithRows(filteredRoutes)
     })
   }
@@ -101,7 +110,7 @@ export default class SearchStopScreen extends React.Component {
     if (this.state.showSearchBar) {
       return <View style={SearchStyles.iBox}>
         <ScrollView>
-          <SearchBar onChange={(e) => this.searchStops(e) } onSearch={(e) => this.onSearch()}
+          <SearchBar onChange={(e) => this.searchStops(e) } onSearch={(e) => console.log(e)}
                      searchTerm={this.props.searchTerm} />
         </ScrollView>
       </View>
@@ -139,10 +148,44 @@ export default class SearchStopScreen extends React.Component {
     }
   }
 
+  setSelectedOption (selectedOption) {
+    console.log('selecting option: ' + selectedOption)
+    this.state.selectedOption = selectedOption
+    this.setState({
+      selectedOption
+    }, this.searchStops(this.state.searchTerm))
+  }
+
+  renderOption (option, selected, onSelect, index) {
+    const style = selected ? { fontWeight: 'bold'} : {}
+
+    return (
+      <TouchableWithoutFeedback onPress={onSelect} key={index}>
+        <View>
+          <Text style={style}>{option}</Text>
+        </View>
+      </TouchableWithoutFeedback>
+    )
+  }
+
+  renderContainer (optionNodes) {
+    return <View>{optionNodes}</View>
+  }
+
   render () {
     return (
       <View style={styles.mainContainer}>
         <View style={SearchStyles.modalHeader}/>
+        <View style={{margin: 20}}>
+          <RadioButtons
+            options={ this.state.directions }
+            onSelection={ this.setSelectedOption.bind(this) }
+            selectedOption={this.state.selectedOption }
+            renderOption={ this.renderOption }
+            renderContainer={ this.renderContainer }
+          />
+        </View>
+          <Text>Selected option: {this.state.selectedOption || 'none'}</Text>
         {this.renderMiddle()}
         <ListView
           contentContainerStyle={styles.listContent}
