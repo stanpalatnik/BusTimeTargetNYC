@@ -9,6 +9,7 @@ import moment from 'moment'
 import Icon from 'react-native-vector-icons/FontAwesome'
 import { Metrics } from '../Themes/'
 import { StackNavigator } from 'react-navigation'
+import PushNotification from '../Services/Notifications.js'
 
 export default class TimePicker extends Component {
   constructor (props) {
@@ -28,6 +29,7 @@ export default class TimePicker extends Component {
     }
 
     this.saveRouteTime = this.saveRouteTime.bind(this)
+    this.notification = PushNotification.create()
   }
 
   _showDateTimePicker = () => this.setState({ isDateTimePickerVisible: true })
@@ -86,6 +88,7 @@ export default class TimePicker extends Component {
         console.log('combined route object: ' + routesList)
         AsyncStorage.setItem('RouteTimes', JSON.stringify(routesList))
       }
+      this.notification.localNotification('routetime created!', 'we\'re going to have so much fun');
       this.props.navigation.navigate('SearchRouteScreen')
     } catch (error) {
       console.log('error saving route time: ' + error)
