@@ -1,5 +1,5 @@
 import React from 'react'
-import { View, Text, TextInput, TouchableOpacity } from 'react-native'
+import { View, TextInput, TouchableOpacity } from 'react-native'
 import styles from './Styles/SearchBarStyles'
 import { Colors, Metrics } from '../Themes/'
 import Icon from 'react-native-vector-icons/FontAwesome'
@@ -32,8 +32,7 @@ export default class SearchBar extends React.Component {
           autoCorrect={false}
           selectionColor={Colors.snow}
         />
-        <TouchableOpacity onPress={() => { this.props.searchTerm = '' }} style={styles.cancelButton}>
-        </TouchableOpacity>
+        <TouchableOpacity onPress={() => { this.props.searchTerm = '' }} style={styles.cancelButton} />
       </View>
     )
   }

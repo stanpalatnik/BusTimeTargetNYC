@@ -8,7 +8,6 @@ import RoundedButton from '../../App/Components/RoundedButton'
 import moment from 'moment'
 import Icon from 'react-native-vector-icons/FontAwesome'
 import { Metrics } from '../Themes/'
-import { StackNavigator } from 'react-navigation'
 import PushNotification from '../Services/Notifications.js'
 
 export default class TimePicker extends Component {
@@ -88,7 +87,7 @@ export default class TimePicker extends Component {
         console.log('combined route object: ' + routesList)
         AsyncStorage.setItem('RouteTimes', JSON.stringify(routesList))
       }
-      this.notification.localNotification('routetime created!', 'we\'re going to have so much fun');
+      this.notification.localNotification('routetime created!', 'we\'re going to have so much fun')
       this.props.navigation.navigate('SearchRouteScreen')
     } catch (error) {
       console.log('error saving route time: ' + error)
@@ -97,28 +96,28 @@ export default class TimePicker extends Component {
 
   render () {
     return (
-    <View style={styles.mainContainer}>
-      <View style={SearchStyles.modalHeader}/>
-      <View style={appStyles.centerButton}>
-        <TouchableOpacity onPress={this._showDateTimePicker}>
-          <Icon name='clock-o' size={Metrics.icons.xxl} />
-        </TouchableOpacity>
+      <View style={styles.mainContainer}>
+        <View style={SearchStyles.modalHeader} />
+        <View style={appStyles.centerButton}>
+          <TouchableOpacity onPress={this._showDateTimePicker}>
+            <Icon name='clock-o' size={Metrics.icons.xxl} />
+          </TouchableOpacity>
+        </View>
+        <Text style={styles.sectionTitle}>{this.state.startTime} - {this.state.endTime}</Text>
+        <Slider
+          value={this.defaultProps.range}
+          step={0.5}
+          minimumValue={1}
+          maximumValue={7}
+          onValueChange={(value) => this._handleRangePicked(value)} />
+        <DateTimePicker
+          mode='time'
+          isVisible={this.state.isDateTimePickerVisible}
+          onConfirm={this._handleDatePicked}
+          onCancel={this._hideDateTimePicker}
+        />
+        {this.renderSaveButton()}
       </View>
-      <Text style={styles.sectionTitle}>{this.state.startTime} - {this.state.endTime}</Text>
-      <Slider
-        value={this.defaultProps.range}
-        step={0.5}
-        minimumValue={1}
-        maximumValue={7}
-        onValueChange={(value) => this._handleRangePicked(value)} />
-      <DateTimePicker
-        mode="time"
-        isVisible={this.state.isDateTimePickerVisible}
-        onConfirm={this._handleDatePicked}
-        onCancel={this._hideDateTimePicker}
-      />
-      {this.renderSaveButton()}
-    </View>
     )
   }
 }

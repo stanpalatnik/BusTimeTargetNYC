@@ -29,6 +29,6 @@ export default StyleSheet.create({
     backgroundColor: Colors.teal,
     paddingTop: 35,
     paddingRight: 20,
-    paddingBottom: 20,
+    paddingBottom: 20
   }
 })

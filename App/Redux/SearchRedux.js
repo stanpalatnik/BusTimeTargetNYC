@@ -1,7 +1,6 @@
 import { createReducer, createActions } from 'reduxsauce'
 import Immutable from 'seamless-immutable'
 import { filter, union, curry } from 'ramda'
-import { startsWith } from 'ramdasauce'
 import { AsyncStorage } from 'react-native'
 import BusTimeAPI from '../../App/Services/BusTimeApi'
 

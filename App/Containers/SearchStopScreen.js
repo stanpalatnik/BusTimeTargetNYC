@@ -1,11 +1,8 @@
 import React from 'react'
-import { ScrollView, ListView, Text, Image, View, LayoutAnimation, TouchableHighlight, TouchableWithoutFeedback } from 'react-native'
+import { ScrollView, ListView, Text, View, LayoutAnimation, TouchableHighlight, AsyncStorage, TouchableWithoutFeedback } from 'react-native'
 import BusTimeAPI from '../../App/Services/BusTimeApi'
 import SearchBar from '../Components/SearchBar'
-import { StackNavigator } from 'react-navigation'
-import TimePicker from './TimePicker'
 import { filter, curry } from 'ramda'
-import { AsyncStorage } from 'react-native'
 import { RadioButtons } from 'react-native-radio-buttons'
 
 // Styles
@@ -110,8 +107,7 @@ export default class SearchStopScreen extends React.Component {
     if (this.state.showSearchBar) {
       return <View style={SearchStyles.iBox}>
         <ScrollView>
-          <SearchBar onChange={(e) => this.searchStops(e) } onSearch={(e) => console.log(e)}
-                     searchTerm={this.props.searchTerm} />
+          <SearchBar onChange={(e) => this.searchStops(e)} onSearch={(e) => console.log(e)} searchTerm={this.props.searchTerm} />
         </ScrollView>
       </View>
     } else {
@@ -144,7 +140,7 @@ export default class SearchStopScreen extends React.Component {
         </TouchableHighlight>
       )
     } else {
-      return <View/>
+      return <View />
     }
   }
 
@@ -157,7 +153,7 @@ export default class SearchStopScreen extends React.Component {
   }
 
   renderOption (option, selected, onSelect, index) {
-    const style = selected ? { fontWeight: 'bold'} : {}
+    const style = selected ? { fontWeight: 'bold' } : {}
 
     return (
       <TouchableWithoutFeedback onPress={onSelect} key={index}>
@@ -175,17 +171,17 @@ export default class SearchStopScreen extends React.Component {
   render () {
     return (
       <View style={styles.mainContainer}>
-        <View style={SearchStyles.modalHeader}/>
+        <View style={SearchStyles.modalHeader} />
         <View style={{margin: 20}}>
           <RadioButtons
-            options={ this.state.directions }
-            onSelection={ this.setSelectedOption.bind(this) }
-            selectedOption={this.state.selectedOption }
-            renderOption={ this.renderOption }
-            renderContainer={ this.renderContainer }
+            options={this.state.directions}
+            onSelection={this.setSelectedOption.bind(this)}
+            selectedOption={this.state.selectedOption}
+            renderOption={this.renderOption}
+            renderContainer={this.renderContainer}
           />
         </View>
-          <Text>Selected option: {this.state.selectedOption || 'none'}</Text>
+        <Text>Selected option: {this.state.selectedOption || 'none'}</Text>
         {this.renderMiddle()}
         <ListView
           contentContainerStyle={styles.listContent}

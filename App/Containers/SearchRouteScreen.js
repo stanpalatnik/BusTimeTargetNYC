@@ -52,8 +52,7 @@ class SearchRouteScreen extends React.Component {
     if (this.state.showSearchBar) {
       return <View style={SearchStyles.iBox}>
         <ScrollView>
-          <SearchBar onChange={(e) => this.props.performSearch(e) } onSearch={(e) => this.onSearch()}
-                     searchTerm={this.props.searchTerm} />
+          <SearchBar onChange={(e) => this.props.performSearch(e)} onSearch={(e) => this.onSearch()} searchTerm={this.props.searchTerm} />
         </ScrollView>
       </View>
     } else {
@@ -84,7 +83,7 @@ class SearchRouteScreen extends React.Component {
   renderRow (rowData) {
     if (rowData !== null && rowData !== undefined && rowData.shortName !== undefined && rowData.shortName.length > 0) {
       return (
-      <TouchableHighlight
+        <TouchableHighlight
           onPress={() => this.selectRoute(rowData)}
           underlayColor='#ddd'
           >
@@ -92,17 +91,17 @@ class SearchRouteScreen extends React.Component {
             <Text style={styles.boldLabel}>{rowData.shortName}</Text>
             <Text style={styles.label}>{rowData.longName}</Text>
           </View>
-      </TouchableHighlight>
+        </TouchableHighlight>
       )
     } else {
-      return <View/>
+      return <View />
     }
   }
 
   render () {
     return (
       <View style={styles.mainContainer}>
-        <View style={SearchStyles.modalHeader}/>
+        <View style={SearchStyles.modalHeader} />
         {this.renderMiddle()}
         <ListView
           contentContainerStyle={styles.listContent}
