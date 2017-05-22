@@ -31,7 +31,6 @@ export default class SearchStopScreen extends React.Component {
     const route = this.props.navigation.state.params
     console.log('getting stops for route: ' + route.id)
     this.getStops(this.props.navigation.state.params.id).then(foundStops => {
-      console.log('found stops!!: ' + foundStops)
       this.setState({
         directions: foundStops.directions.map(e => e.name.name),
         directionStopMap: foundStops.directions,
