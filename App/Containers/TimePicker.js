@@ -73,7 +73,7 @@ export default class TimePicker extends Component {
       route: route,
       stop: stop
     }
-    console.log('adding routetime: ' + JSON.stringify(trackerObj))
+    console.log('adding time : ' + JSON.stringify(trackerObj))
     try {
       const routes = await AsyncStorage.getItem('RouteTimes')
       if (routes === null) {
@@ -87,7 +87,9 @@ export default class TimePicker extends Component {
         console.log('combined route object: ' + routesList)
         AsyncStorage.setItem('RouteTimes', JSON.stringify(routesList))
       }
-      this.notification.localNotification('routetime created!', 'we\'re going to have so much fun')
+      let notifcationTime = moment(this.state.selectedTime).add(24, 'h') + 900000 // add 15 minute padding
+      this.notification.localNotification('Route configured. You will receive notifications as the route time approaches')
+      this.notification.scheduledNotification('Upcoming Buses', 'Click here to start tracking upcoming buses for your route', notifcationTime)
       this.props.navigation.navigate('SearchRouteScreen')
     } catch (error) {
       console.log('error saving route time: ' + error)
@@ -112,6 +114,7 @@ export default class TimePicker extends Component {
           onValueChange={(value) => this._handleRangePicked(value)} />
         <DateTimePicker
           mode='time'
+          is24Hour={false}
           isVisible={this.state.isDateTimePickerVisible}
           onConfirm={this._handleDatePicked}
           onCancel={this._hideDateTimePicker}

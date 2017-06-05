@@ -19,7 +19,7 @@ async function getRoutes () {
       const transitRoutes = await api.getRoutes('MTA NYCT')
       const combinedRoutes = union(busCompanyRoutes.data['data'].list, transitRoutes.data['data'].list)
       AsyncStorage.setItem('Routes', JSON.stringify(combinedRoutes))
-      ROUTES = union(ROUTES, JSON.parse(busCompanyRoutes))
+      ROUTES = union(ROUTES, combinedRoutes)
     }
   } catch (error) {
     console.log(error)
