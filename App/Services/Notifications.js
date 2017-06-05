@@ -60,6 +60,7 @@ const create = () => {
   }
 
   const scheduledNotification = (title, message, date) => {
+    console.log('scheduling notification for: ' + date)
     PushNotification.localNotificationSchedule({
       title: title, // (optional, for iOS this is only used in apple watch, the title will be the app name on other iOS devices)
       message: message, // (required)

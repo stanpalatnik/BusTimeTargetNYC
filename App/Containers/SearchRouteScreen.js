@@ -55,15 +55,6 @@ class SearchRouteScreen extends React.Component {
           <SearchBar onChange={(e) => this.props.performSearch(e)} onSearch={(e) => this.onSearch()} searchTerm={this.props.searchTerm} />
         </ScrollView>
       </View>
-    } else {
-      return (
-        <ListView
-          contentContainerStyle={styles.listContent}
-          dataSource={this.state.dataSource}
-          renderRow={this.renderRow}
-          pageSize={15}
-        />
-      )
     }
   }
 
@@ -108,6 +99,7 @@ class SearchRouteScreen extends React.Component {
           dataSource={this.state.dataSource}
           renderRow={this.renderRow}
           pageSize={30}
+          enableEmptySections={true}
         />
       </View>
     )

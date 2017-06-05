@@ -87,7 +87,7 @@ export default class TimePicker extends Component {
         console.log('combined route object: ' + routesList)
         AsyncStorage.setItem('RouteTimes', JSON.stringify(routesList))
       }
-      let notifcationTime = moment(this.state.selectedTime).add(24, 'h') + 900000 // add 15 minute padding
+      let notifcationTime = moment(this.state.selectedTime).add(24, 'h').subtract(15, 'm').toDate() // add 15 minute padding
       this.notification.localNotification('Route configured. You will receive notifications as the route time approaches')
       this.notification.scheduledNotification('Upcoming Buses', 'Click here to start tracking upcoming buses for your route', notifcationTime)
       this.props.navigation.navigate('SearchRouteScreen')
