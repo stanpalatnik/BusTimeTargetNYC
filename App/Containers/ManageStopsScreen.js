@@ -1,7 +1,7 @@
 import React from 'react'
 import { View, Modal, Text, TouchableOpacity, AsyncStorage } from 'react-native'
 import RoundedButton from '../../App/Components/RoundedButton'
-import SearchRouteScreen from './SearchRouteScreen'
+import ShowStopsScreen from './ShowStopsScreen'
 import { Images } from '../Themes'
 import AlertMessage from '../../App/Components/AlertMessage'
 import moment from 'moment'
@@ -17,6 +17,10 @@ export default class ManageStopsScreen extends React.Component {
       hasRouteTimes: false,
       loading: true
     }
+  }
+
+  toggleModal = () => {
+    this.setState({showModal: !this.state.showModal})
   }
 
   getRouteTimes = async () => {
@@ -59,16 +63,25 @@ export default class ManageStopsScreen extends React.Component {
       return (
         <View>
           <Text>You have {this.state.routes.length} configured routes.</Text>
-          <RoundedButton onPress={this.manageRouteScreen}>
+          <RoundedButton onPress={this.toggleModal}>
             Manage Routes
           </RoundedButton>
+          <Modal
+            visible={this.state.showModal}
+            onRequestClose={this.toggleModal}>
+            <TouchableOpacity onPress={this.toggleModal} style={{
+              position: 'absolute',
+              paddingTop: 10,
+              paddingHorizontal: 10,
+              zIndex: 10
+            }}>
+              <Image source={Images.closeButton2x} />
+            </TouchableOpacity>
+            <ShowStopsScreen />
+          </Modal>
         </View>
       )
     }
-  }
-
-  manageRouteScreen = () => {
-    this.componentWillMount()
   }
 
   renderUpcomingRoutes = () => {
